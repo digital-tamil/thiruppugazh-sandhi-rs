@@ -87,6 +87,8 @@ fn main() {
         if let Some(song) = scrape_thirupugazh(id) {
             let mut data = all_songs.lock().unwrap();
             data.push(song);
+        } else {
+            eprintln!("Could not scrap song {:02}", id);
         }
     });
 
