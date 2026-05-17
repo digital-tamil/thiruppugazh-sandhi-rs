@@ -1,7 +1,7 @@
 use rayon::prelude::*;
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, LazyLock, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -10,6 +10,11 @@ struct Verse {
     original: String,
     split: String,
 }
+
+// Selectors
+static COL_SELECTOR: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse(".wp-block-column").unwrap());
+static P_SELECTOR: LazyLock<Selector> = LazyLock::new(|| Selector::parse("p").unwrap());
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Thirupugazh {
@@ -28,18 +33,14 @@ fn scrape_thirupugazh(id: u16) -> Option<Thirupugazh> {
     let response = reqwest::blocking::get(&url).ok()?.text().ok()?;
     let document = Html::parse_document(&response);
 
-    // Selectors
-    let col_selector = Selector::parse(".wp-block-column").unwrap();
-    let p_selector = Selector::parse("p").unwrap();
-
-    let columns: Vec<_> = document.select(&col_selector).collect();
+    let columns: Vec<_> = document.select(&COL_SELECTOR).collect();
     if columns.len() < 2 {
         return None;
     }
 
     // Extract lines from columns
-    let left_lines: Vec<_> = columns[0]
-        .select(&p_selector)
+    let left_lines: Vec<String> = columns[0]
+        .select(&P_SELECTOR)
         .filter_map(|p| {
             let text: String = p.text().collect();
             let trimmed: &str = text.trim();
@@ -53,7 +54,7 @@ fn scrape_thirupugazh(id: u16) -> Option<Thirupugazh> {
         .collect();
 
     let right_lines: Vec<String> = columns[1]
-        .select(&p_selector)
+        .select(&P_SELECTOR)
         .filter_map(|p| {
             let text: String = p.text().collect();
             let trimmed = text.trim();
