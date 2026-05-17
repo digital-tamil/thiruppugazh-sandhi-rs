@@ -1,6 +1,6 @@
 
 
-# 🕉️ Thiruppugazh Sandhi Corpus (thiruppugazh-sandhi-rs)
+# 🦚 Thiruppugazh Sandhi Corpus (thiruppugazh-sandhi-rs)
 
 [![Rust](https://img.shields.io/badge/language-Rust-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/license-ODbL-blue.svg)](https://opendatacommons.org/licenses/odbl/)

@@ -38,16 +38,32 @@ fn scrape_thirupugazh(id: u16) -> Option<Thirupugazh> {
     }
 
     // Extract lines from columns
-    let left_lines: Vec<String> = columns[0]
+    let left_lines: Vec<_> = columns[0]
         .select(&p_selector)
-        .map(|p| p.text().collect::<Vec<_>>().join("").trim().to_string())
-        .filter(|s| !s.is_empty())
+        .filter_map(|p| {
+            let text: String = p.text().collect();
+            let trimmed: &str = text.trim();
+
+            if trimmed.is_empty() {
+                None
+            } else {
+                Some(trimmed.to_owned())
+            }
+        })
         .collect();
 
     let right_lines: Vec<String> = columns[1]
         .select(&p_selector)
-        .map(|p| p.text().collect::<Vec<_>>().join("").trim().to_string())
-        .filter(|s| !s.is_empty())
+        .filter_map(|p| {
+            let text: String = p.text().collect();
+            let trimmed = text.trim();
+
+            if trimmed.is_empty() {
+                None
+            } else {
+                Some(trimmed.to_owned())
+            }
+        })
         .collect();
 
     if left_lines.is_empty() || right_lines.is_empty() {
